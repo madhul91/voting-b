@@ -14,8 +14,14 @@ const cors = require('cors')
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 app.use(cookieParser());
-app.use(cors());
+const allowedOrigins = ['https://voting-f-madhul91s-projects.vercel.app'];
 
+app.use(cors({
+    origin: allowedOrigins,  // Allow requests only from this domain
+    credentials: true,  // Allow cookies & authentication headers
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization']  // Allowed headers
+}));
 
 
   
