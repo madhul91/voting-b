@@ -95,7 +95,7 @@ try{
     })
     if(isMatch){
         console.log('Login Successfull')
-        res.status(200).send('Logged in ')
+        res.status(200).json({ message: "Logged in" });
     }
 }
 catch(e){
@@ -148,28 +148,34 @@ app.get('/logout' ,auth,async(req,res)=>{
 
 
 
-app.post('/voterecording',auth,async(req,res)=>{
-    try{
-        const aadhar = req.body.aadhar;
-        const password = req.body.password;
-        const user = await Register.findOne({aadhar:aadhar});
-        const isMatch = await bcrypt.compare(password,user.password);
-        if(isMatch){
-            if(user.voted.length !== 1){
-                const registerVote = user.voting(req.body.party);
-                console.log('success')
-                res.send('done');
-            }
-            else{
-                console.log('already voted')
-                res.status(500).send('already voted')
-            }
+app.post('/voterecording', auth, async (req, res) => {
+    try {
+        const { aadhar, password, party } = req.body;
+        const user = await Register.findOne({ aadhar: aadhar });
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+
+        if (user.voted.length >= 1) {
+            console.log('Already voted');
+            return res.status(400).json({ message: "Already voted" });
         }
-    }catch(e){
-        console.log('problem in voting')
-        res.status(404).send()
+
+        user.voted.push({ vote: true, party });
+        user.voteStatus = true;
+        await user.save();
+        console.log('Vote recorded');
+        res.status(200).json({ message: "Vote recorded successfully" });
+
+    } catch (e) {
+        console.log('Problem in voting', e.message);
+        res.status(500).json({ message: "Internal Server Error" });
     }
-})
+});
+
 
 app.get('/',(req,res)=>{
     res.send('helo ')
