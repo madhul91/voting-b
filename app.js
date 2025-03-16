@@ -171,7 +171,9 @@ app.post('/voterecording',auth,async(req,res)=>{
     }
 })
 
-
+app.get('/',(req,res)=>{
+    res.send('helo ')
+})
 // listening to server
 app.listen(port, ()=>{
     console.log(`listening to port ${port}`);
