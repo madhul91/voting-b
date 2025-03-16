@@ -1,21 +1,21 @@
-const jwt = require('jsonwebtoken')
-const Register = require('../models/register')
+const jwt = require("jsonwebtoken");
+const Register = require("../models/register");
 
-const auth = async(req,res,next) => {
-try{
-    const token = req.cookies.jwt;
-    const verifyUser = jwt.verify(token , process.env.SECRET_KEY);
-    
+const auth = async (req, res, next) => {
+    try {
+        const token = req.cookies.jwt || req.headers.authorization?.split(" ")[1];
 
-    const user = await Register.findOne({ _id:verifyUser._id});
-    req.token = token;
-    req.user = user;
-    next();
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized. Please log in." });
+        }
 
-}catch(e){
-res.status(400).send('Login to access this page');
-}
-
-}
+        const verifyUser = jwt.verify(token, process.env.SECRET_KEY);
+        req.user = await Register.findById(verifyUser._id);
+        
+        next();
+    } catch (err) {
+        res.status(401).json({ message: "Invalid token. Please log in again." });
+    }
+};
 
 module.exports = auth;
