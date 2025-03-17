@@ -14,7 +14,7 @@ const cors = require('cors')
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 app.use(cookieParser());
-const allowedOrigins = ['https://voting-f.vercel.app/'];
+const allowedOrigins = ['https://voting-f-git-main-madhul91s-projects.vercel.app'];
 
 app.use(cors({
     origin: allowedOrigins,  // Allow requests only from this domain
